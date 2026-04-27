@@ -1409,6 +1409,12 @@ app.use(requireDashboardAuth, async (req, res) => {
     }
   }
 
+  // Strip /openclaw prefix so sub-resources (/__openclaw/*, /assets/*, etc.)
+  // resolve correctly when the Control UI is mounted at /openclaw.
+  if (req.url.startsWith("/openclaw/")) {
+    req.url = req.url.slice("/openclaw".length);
+  }
+
   attachGatewayAuthHeader(req);
   return proxy.web(req, res, { target: GATEWAY_TARGET });
 });
