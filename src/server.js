@@ -65,16 +65,22 @@ function resolveGatewayToken() {
     // best-effort
   }
 
+  const configPath = path.join(STATE_DIR, 'openclaw.json');
+  let cfg = {};
+  try { cfg = JSON.parse(fs.readFileSync(configPath, 'utf8')); } catch {}
+  cfg.gateway ??= {};
+  cfg.gateway.controlUi ??= {};
+  cfg.gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback = true;
   const allowedOriginsEnv = process.env.CONTROL_UI_ALLOWED_ORIGINS;
   if (allowedOriginsEnv) {
-    const configPath = path.join(STATE_DIR, 'openclaw.json');
-    let cfg = {};
-    try { cfg = JSON.parse(fs.readFileSync(configPath, 'utf8')); } catch {}
-    cfg.gateway ??= {};
-    cfg.gateway.controlUi ??= {};
     cfg.gateway.controlUi.allowedOrigins = allowedOriginsEnv.split(',').map(s => s.trim());
-    try { fs.mkdirSync(STATE_DIR, { recursive: true }); } catch {}
+  }
+  try { fs.mkdirSync(STATE_DIR, { recursive: true }); } catch {}
+  try {
     fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
+    console.log('[clawdbot] wrote openclaw.json:', JSON.stringify(cfg.gateway));
+  } catch (e) {
+    console.error('[clawdbot] failed to write openclaw.json:', e.message);
   }
 
   return generated;
