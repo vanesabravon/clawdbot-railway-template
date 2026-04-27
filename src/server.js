@@ -62,20 +62,21 @@ function resolveGatewayToken() {
     fs.mkdirSync(STATE_DIR, { recursive: true });
     fs.writeFileSync(tokenPath, generated, { encoding: "utf8", mode: 0o600 });
   } catch {
-
-    // Write allowedOrigins config from env var
-const allowedOriginsEnv = process.env.CONTROL_UI_ALLOWED_ORIGINS;
-if (allowedOriginsEnv) {
-  const configPath = path.join(STATE_DIR, 'openclaw.json');
-  let cfg = {};
-  try { cfg = JSON.parse(fs.readFileSync(configPath, 'utf8')); } catch {}
-  cfg.gateway ??= {};
-  cfg.gateway.controlUi ??= {};
-  cfg.gateway.controlUi.allowedOrigins = allowedOriginsEnv.split(',').map(s => s.trim());
-  fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
-}
     // best-effort
   }
+
+  const allowedOriginsEnv = process.env.CONTROL_UI_ALLOWED_ORIGINS;
+  if (allowedOriginsEnv) {
+    const configPath = path.join(STATE_DIR, 'openclaw.json');
+    let cfg = {};
+    try { cfg = JSON.parse(fs.readFileSync(configPath, 'utf8')); } catch {}
+    cfg.gateway ??= {};
+    cfg.gateway.controlUi ??= {};
+    cfg.gateway.controlUi.allowedOrigins = allowedOriginsEnv.split(',').map(s => s.trim());
+    try { fs.mkdirSync(STATE_DIR, { recursive: true }); } catch {}
+    fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
+  }
+
   return generated;
 }
 
