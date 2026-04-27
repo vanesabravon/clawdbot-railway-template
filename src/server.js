@@ -208,9 +208,7 @@ async function startGateway() {
     "--port",
     String(INTERNAL_GATEWAY_PORT),
     "--auth",
-    "token",
-    "--token",
-    OPENCLAW_GATEWAY_TOKEN,
+    "none",
   ];
 
   gatewayProc = childProcess.spawn(OPENCLAW_NODE, clawArgs(args), {
@@ -1407,12 +1405,6 @@ app.use(requireDashboardAuth, async (req, res) => {
       ].join("\n");
       return res.status(503).type("text/plain").send(hint);
     }
-  }
-
-  // Strip /openclaw prefix so sub-resources (/__openclaw/*, /assets/*, etc.)
-  // resolve correctly when the Control UI is mounted at /openclaw.
-  if (req.url.startsWith("/openclaw/")) {
-    req.url = req.url.slice("/openclaw".length);
   }
 
   attachGatewayAuthHeader(req);
