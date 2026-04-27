@@ -65,6 +65,13 @@ function resolveGatewayToken() {
     // best-effort
   }
 
+  return generated;
+}
+
+const OPENCLAW_GATEWAY_TOKEN = resolveGatewayToken();
+
+// Always patch openclaw.json to allow the Control UI origin from behind a reverse proxy.
+{
   const configPath = path.join(STATE_DIR, 'openclaw.json');
   let cfg = {};
   try { cfg = JSON.parse(fs.readFileSync(configPath, 'utf8')); } catch {}
@@ -82,11 +89,7 @@ function resolveGatewayToken() {
   } catch (e) {
     console.error('[clawdbot] failed to write openclaw.json:', e.message);
   }
-
-  return generated;
 }
-
-const OPENCLAW_GATEWAY_TOKEN = resolveGatewayToken();
 process.env.OPENCLAW_GATEWAY_TOKEN = OPENCLAW_GATEWAY_TOKEN;
 
 // Where the gateway will listen internally (we proxy to it).
